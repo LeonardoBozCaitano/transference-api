@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: "postgres"
+    image: postgres
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: "bank-trasference,postgres: bank-customer,postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+  localstack:
+    container_name: localstack
+    image: localstack/localstack
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - HOSTNAME_EXTERNAL=localhost
+      - SERVICES=sns,sqs
+    ports:
+      - "443:443"
+      - "8080:8080"
+      - "4597:4597"
+      - "4575:4575"
+      - "4576:4576"
+    depends_on:
+      - postgres
+  setup-resources:
+    image: mesosphere/aws-cli
+    container_name: setup-resources
+    entrypoint: /bin/sh -c
+    command: >
+      "
+        sleep 20
+        awslocal sqs create-queue --endpoint-url=http://localhost:4566 --queue-name transference-process
+      "
+    depends_on:
+      - localstack

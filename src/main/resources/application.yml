@@ -1,0 +1,23 @@
+server:
+  port : 8081
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/bank-transference}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    initialization-mode: always
+    platform: postgres
+
+sqs:
+  queues:
+    transference:
+      url: https://sqs.us-east-1.amazonaws.com/220763882526/bank-transference-test
